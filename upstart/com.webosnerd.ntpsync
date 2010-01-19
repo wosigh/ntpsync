@@ -1,0 +1,2 @@
+chdir /usr/bin
+exec /usr/bin/ntpdate -u pool.ntp.org

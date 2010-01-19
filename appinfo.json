@@ -1,0 +1,10 @@
+{
+	"id": "com.webosnerd.ntpsync",
+	"version": "0.2.0",
+	"vendor": "webosnerd.com",
+	"type": "web",
+	"main": "index.html",
+	"title": "NTP Sync",
+	"icon": "icon.png",
+	"noWindow": "true"
+}
