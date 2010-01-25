@@ -4,15 +4,45 @@
 // Copyright 2010
 
 var ServiceID = 'palm://org.webosinternals.upstartmgr';
+var StageName = 'mainstage';
 
 function AppAssistant (appController)
 {
 }
 
 AppAssistant.prototype.handleLaunch = function (launchParams)
-{	
+{
+	this.controller = Mojo.Controller.getAppController();	
 	if (launchParams.source != "notification")
 		var sync = AppAssistant.syncClock();
+	else
+	{
+		// Determine if the stage is already present
+		var stageProxy = this.controller.getStageProxy(StageName);
+		var stageController = this.controller.getStageController(StageName);
+	
+		// If it is present, open and focus the stage
+	
+		if (stageProxy)
+		{
+			if (stageController)
+			{
+				stageController.window.focus();
+			}
+		}
+		// Otherwise, create the stage and show it
+		else
+		{
+			var pushMainScene = function(stageController)
+			{
+				stageController.pushScene("main");
+			};
+		
+			var stageArguments = {name: "StageName", lightweight: true};
+			
+			Mojo.Controller.getAppController().createStageWithCallback(stageArguments, pushMainScene, "card");
+		}
+	}
 };
 
 AppAssistant.syncClock = function ()
