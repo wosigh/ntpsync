@@ -1,6 +1,6 @@
 {
 	"id": "com.webosnerd.ntpsync",
-	"version": "0.2.99-0",
+	"version": "0.2.99",
 	"vendor": "webosnerd.com",
 	"type": "web",
 	"main": "index.html",

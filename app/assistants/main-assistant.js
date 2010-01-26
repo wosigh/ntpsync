@@ -7,6 +7,29 @@ function MainAssistant() {
 
 MainAssistant.prototype.setup = function() {
 
+		this.controller.setupWidget
+	("enable-vibration",
+		this.attributes = {
+			trueValue: 'On',
+			falseValue: 'Off' 
+		},
+		this.model = {
+			value: 'On',
+			disabled: true
+		}
+	);
+	
+	this.controller.setupWidget
+	("enable-sound",
+		this.attributes = {
+			trueValue: 'On',
+			falseValue: 'Off' 
+		},
+		this.model = {
+			value: false,
+			disabled: true
+		}
+	);
 	
 	this.controller.setupWidget
 	("auto-sync",
@@ -33,7 +56,7 @@ MainAssistant.prototype.setup = function() {
 	);
 	
 	this.controller.setupWidget
-	("show-notification",
+	("suppress-notification",
 		this.attributes = {
 			trueValue: 'On',
 			falseValue: 'Off' 
