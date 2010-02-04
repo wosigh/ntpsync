@@ -7,66 +7,44 @@ function MainAssistant() {
 
 MainAssistant.prototype.setup = function() {
 
-		this.controller.setupWidget
-	("enable-vibration",
-		this.attributes = {
-			trueValue: 'On',
-			falseValue: 'Off' 
-		},
-		this.model = {
-			value: 'On',
-			disabled: true
-		}
-	);
+	var CookieData = AppAssistant.Cookie.get();
+	var AutoSync = false;
 	
-	this.controller.setupWidget
-	("enable-sound",
-		this.attributes = {
-			trueValue: 'On',
-			falseValue: 'Off' 
-		},
-		this.model = {
-			value: false,
-			disabled: true
+	if (CookieData)
+	{
+		if (CookieData.AutoSync == true)
+		{
+			AutoSync = true;
 		}
-	);
+	}
 	
 	this.controller.setupWidget
 	("auto-sync",
 		this.attributes = {
-			trueValue: 'On',
-			falseValue: 'Off' 
+			trueValue: true,
+			falseValue: false 
 		},
 		this.model = {
-			value: false,
-			disabled: false
-		}
-	);	
-	
-	this.controller.setupWidget
-	("sync-interval",
-		this.attributes = {
-			multiline: false,
-			enterSubmits: false
-		},
-		this.model = {
-			value: "1",
-			disabled: true
-		}
-	);
-	
-	this.controller.setupWidget
-	("suppress-notification",
-		this.attributes = {
-			trueValue: 'On',
-			falseValue: 'Off' 
-		},
-		this.model = {
-			value: false,
+			value: AutoSync,
 			disabled: false
 		}
 	);
 	
+	this.menuAttr = {omitDefaultItems: true};
+	
+	this.menuModel = {
+		visible: true,
+		items: [
+			{label: "Advanced...", command: 'do-advanced', disabled: true},
+			Mojo.Menu.editItem,
+			Mojo.Menu.prefsItem,
+			Mojo.Menu.helpItem
+    	]
+	};
+	
+	this.controller.setupWidget(Mojo.Menu.appMenu, this.menuAttr, this.menuModel);
+	
+	Mojo.Event.listen(this.controller.get("auto-sync"), Mojo.Event.propertyChanged, this.handleOption.bind(this));
 	
 	
 	/* this function is for setup tasks that have to happen when the scene is first created */
@@ -94,7 +72,28 @@ MainAssistant.prototype.cleanup = function(event) {
 	   a result of being popped off the scene stack */
 }
 
-MainAssistant.prototype.handleButtonPress = function(event)
+MainAssistant.prototype.handleOption = function(event)
 {
-	AppAssistant.syncClock();
+	this.controller.showBanner ("Triggered: " + event.value.toString(), { source: 'notification' });
+	if (event.value == true)
+	{
+		AppAssistant.Cookie.put({"AutoSync": true });
+	}
+	else
+	{
+		AppAssistant.Cookie.put({"AutoSync": false });
+	}
+}
+
+MainAssistant.prototype.handleCommand = function(event)
+{
+	if (event.type == Mojo.Event.command)
+	{
+		switch (event.command)
+		{
+			case 'do-advanced':
+				AppAssistant.StageController.pushScene('advanced');
+				break;
+		}
+	}
 }

@@ -10,6 +10,10 @@ function AppAssistant (appController)
 {
 }
 
+AppAssistant.StageController = null;
+
+AppAssistant.Cookie = new Mojo.Model.Cookie("SyncPrefs");
+
 AppAssistant.prototype.handleLaunch = function (launchParams)
 {
 	this.controller = Mojo.Controller.getAppController();	
@@ -36,6 +40,7 @@ AppAssistant.prototype.handleLaunch = function (launchParams)
 			var pushMainScene = function(stageController)
 			{
 				stageController.pushScene("main");
+				AppAssistant.StageController = stageController;
 			};
 		
 			var stageArguments = {name: "StageName", lightweight: true};
@@ -43,10 +48,25 @@ AppAssistant.prototype.handleLaunch = function (launchParams)
 			Mojo.Controller.getAppController().createStageWithCallback(stageArguments, pushMainScene, "card");
 		}
 	}
-};
+}
 
 AppAssistant.syncClock = function ()
 {
+	var CookieData = this.Cookie.get();
+	
+	if (CookieData)
+	{
+		if (CookieData.AutoSync == true)
+		{
+			this.scheduleSync(1);
+			// this.controller.showBanner("Auto on", { source: 'notification' });
+		}
+	}
+	else
+	{
+		// this.controller.showBanner("No cookie", { source: 'notification' });
+	}
+	
 	var syncRequest = new Mojo.Service.Request
 	(
 		ServiceID,
@@ -72,4 +92,25 @@ AppAssistant.syncOK = function ()
 AppAssistant.syncFail = function ()
 {
 	Mojo.Controller.getAppController().showBanner("Synchronization failed", { source: 'notification' });
+}
+
+AppAssistant.scheduleSync = function (interval)
+{
+	var schedReq = new Mojo.Service.Request
+	(
+		'palm://com.palm.power/timeout',
+		{
+			method: "set",
+			parameters:
+			{
+				"key": "com.webosnerd.ntpsync.sync",
+				"uri": "palm://com.palm.applicationManager/open",
+				"in": "00:00:30",
+				"params": {
+					"id": "com.webosnerd.ntpsync",
+					"params": {"source": "none"}
+				}
+			}
+		}
+	);
 }

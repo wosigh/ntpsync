@@ -1,0 +1,43 @@
+<div id="main">
+	<div class="palm-page-header">
+		<div class="palm-page-header-wrapper">
+			<div class="title left">Advanced Options</div>
+		</div>
+	</div>
+
+	<div class="palm-group">
+		<div class="palm-group-title">notifications</div>
+		<div class="palm-list">
+			<div class="palm-row first">
+				<div class="palm-row-wrapper">
+					<div x-mojo-element="CheckBox" class="left" id="enable-vibration"></div>
+					<div class="title right disabled">Vibrate on Success</div>
+				</div>
+			</div>
+			<div class="palm-row last">
+				<div class="palm-row-wrapper">
+					<div x-mojo-element="CheckBox" class="left" id="enable-sound"></div>
+					<div class="title right disabled">Sound on Failure</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="palm-group">
+		<div class="palm-group-title">Background Sync</div>
+		<div class="palm-list">
+			<div class="palm-row first">
+				<div class="palm-row-wrapper textfield-group" x-mojo-focus-highlight="true">
+					<div class="label disabled">interval</div>
+					<div id="sync-interval" x-mojo-element="SmartTextField"></div>
+				</div>
+			</div>
+			<div class="palm-row last">
+				<div class="palm-row-wrapper">
+					<div x-mojo-element="CheckBox" class="left" id="suppress-notification"></div>
+					<div class="title right disabled">Only Notify on Failure</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
