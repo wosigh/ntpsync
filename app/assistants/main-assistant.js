@@ -74,7 +74,7 @@ MainAssistant.prototype.cleanup = function(event) {
 
 MainAssistant.prototype.handleOption = function(event)
 {
-	this.controller.showBanner ("Triggered: " + event.value.toString(), { source: 'notification' });
+	// this.controller.showBanner ("Triggered: " + event.value.toString(), { source: 'notification' });
 	if (event.value == true)
 	{
 		AppAssistant.Cookie.put({"AutoSync": true });

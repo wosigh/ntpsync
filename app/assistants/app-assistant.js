@@ -17,10 +17,10 @@ AppAssistant.Cookie = new Mojo.Model.Cookie("SyncPrefs");
 AppAssistant.prototype.handleLaunch = function (launchParams)
 {
 	this.controller = Mojo.Controller.getAppController();	
-	if (launchParams.source != "notification")
-		var sync = AppAssistant.syncClock();
-	else
-	{
+//	if (launchParams.source != "notification")
+//		var sync = AppAssistant.syncClock();
+//	else
+//	{
 		// Determine if the stage is already present
 		var stageProxy = this.controller.getStageProxy(StageName);
 		var stageController = this.controller.getStageController(StageName);
@@ -47,25 +47,26 @@ AppAssistant.prototype.handleLaunch = function (launchParams)
 			
 			Mojo.Controller.getAppController().createStageWithCallback(stageArguments, pushMainScene, "card");
 		}
-	}
+		var sync = AppAssistant.syncClock();
+	//}
 }
 
 AppAssistant.syncClock = function ()
 {
 	var CookieData = this.Cookie.get();
 	
-	if (CookieData)
-	{
-		if (CookieData.AutoSync == true)
-		{
+//	if (CookieData)
+//	{
+//		if (CookieData.AutoSync == true)
+//		{
 			this.scheduleSync(1);
 			// this.controller.showBanner("Auto on", { source: 'notification' });
-		}
-	}
-	else
-	{
+//		}
+//	}
+//	else
+//	{
 		// this.controller.showBanner("No cookie", { source: 'notification' });
-	}
+//	}
 	
 	var syncRequest = new Mojo.Service.Request
 	(
@@ -96,7 +97,8 @@ AppAssistant.syncFail = function ()
 
 AppAssistant.scheduleSync = function (interval)
 {
-	var schedReq = new Mojo.Service.Request
+	//Mojo.Controller.getAppController().showBanner("Sync scheduled", { source: 'notification' });
+	this.schedReq = new Mojo.Service.Request
 	(
 		'palm://com.palm.power/timeout',
 		{
@@ -104,13 +106,23 @@ AppAssistant.scheduleSync = function (interval)
 			parameters:
 			{
 				"key": "com.webosnerd.ntpsync.sync",
+				"in": "00:05:00",
+				"wakeup": true,
 				"uri": "palm://com.palm.applicationManager/open",
-				"in": "00:00:30",
-				"params": {
-					"id": "com.webosnerd.ntpsync",
-					"params": {"source": "none"}
-				}
-			}
+				"params": '{"id":"com.webosnerd.ntpsync","params":{"source":"none"}}'
+			},
+			onSuccess:	this.succeeded.bind(this),
+			onFailure:	this.failed.bind(this)
 		}
 	);
+}
+
+AppAssistant.failed = function (response)
+{
+	Mojo.Controller.getAppController().showBanner(response.errorText, { source: 'notification' });
+}
+
+AppAssistant.succeeded = function ()
+{
+	Mojo.Controller.getAppController().showBanner("Succeeded", { source: 'notification' });
 }
