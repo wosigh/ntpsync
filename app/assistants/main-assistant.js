@@ -78,6 +78,7 @@ MainAssistant.prototype.handleOption = function(event)
 	if (event.value == true)
 	{
 		AppAssistant.Cookie.put({"AutoSync": true });
+		AppAssistant.scheduleSync(1);
 	}
 	else
 	{
