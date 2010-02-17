@@ -59,15 +59,10 @@ AppAssistant.syncClock = function ()
 		if (CookieData.AutoSync == true)
 		{
 			this.scheduleSync(1);
-			// this.controller.showBanner("Auto on", { source: 'notification' });
 		}
 	}
-	else
-	{
-		// this.controller.showBanner("No cookie", { source: 'notification' });
-	}
 	
-	var syncRequest = new Mojo.Service.Request
+	this.syncReq = new Mojo.Service.Request
 	(
 		ServiceID,
 		{
@@ -96,7 +91,6 @@ AppAssistant.syncFail = function ()
 
 AppAssistant.scheduleSync = function (interval)
 {
-	//Mojo.Controller.getAppController().showBanner("Sync scheduled", { source: 'notification' });
 	this.schedReq = new Mojo.Service.Request
 	(
 		'palm://com.palm.power/timeout',
@@ -109,19 +103,19 @@ AppAssistant.scheduleSync = function (interval)
 				"wakeup": true,
 				"uri": "palm://com.palm.applicationManager/open",
 				"params": '{"id":"com.webosnerd.ntpsync","params":{"source":"none"}}'
-			},
-			onSuccess:	this.succeeded.bind(this),
-			onFailure:	this.failed.bind(this)
+			}
 		}
 	);
 }
 
-AppAssistant.failed = function (response)
+AppAssistant.clearSync = function ()
 {
-	Mojo.Controller.getAppController().showBanner(response.errorText, { source: 'notification' });
-}
-
-AppAssistant.succeeded = function ()
-{
-	Mojo.Controller.getAppController().showBanner("Succeeded", { source: 'notification' });
+	this.clearReq = new Mojo.Service.Request
+	(
+		'palm://com.palm.power/timeout',
+		{
+			method: "clear",
+			parameters: {"key": "com.webosnerd.ntpsync.sync"}
+		}
+	);
 }
