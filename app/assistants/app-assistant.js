@@ -99,7 +99,7 @@ AppAssistant.scheduleSync = function (interval)
 			parameters:
 			{
 				"key": "com.webosnerd.ntpsync.sync",
-				"in": "00:10:00",
+				"in": "08:00:00",
 				"wakeup": true,
 				"uri": "palm://com.palm.applicationManager/open",
 				"params": '{"id":"com.webosnerd.ntpsync","params":{"source":"none"}}'
