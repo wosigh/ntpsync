@@ -17,9 +17,9 @@ AppAssistant.Cookie = new Mojo.Model.Cookie("SyncPrefs");
 AppAssistant.prototype.handleLaunch = function (launchParams)
 {
 	this.controller = Mojo.Controller.getAppController();	
-	if (launchParams.source != "notification")
-		var sync = AppAssistant.syncClock();
-	else
+	if (launchParams.source == "alarm")
+		var sync = AppAssistant.syncClock(false, true);
+	else if (launchParams.source == "notification")
 	{
 		// Determine if the stage is already present
 		var stageProxy = this.controller.getStageProxy(StageName);
@@ -48,17 +48,22 @@ AppAssistant.prototype.handleLaunch = function (launchParams)
 			Mojo.Controller.getAppController().createStageWithCallback(stageArguments, pushMainScene, "card");
 		}
 	}
+	else
+		var sync = AppAssistant.syncClock(true, false);		
 }
 
-AppAssistant.syncClock = function ()
+AppAssistant.syncClock = function (showBanner, setTimer)
 {
-	var CookieData = this.Cookie.get();
-	
-	if (CookieData)
+	if (setTimer)
 	{
-		if (CookieData.AutoSync == true)
+		var CookieData = this.Cookie.get();
+	
+		if (CookieData)
 		{
-			this.scheduleSync(1);
+			if (CookieData.AutoSync == true)
+			{
+				this.scheduleSync(8);
+			}
 		}
 	}
 	
@@ -71,22 +76,30 @@ AppAssistant.syncClock = function ()
 			{
 				'id': 'com.webosnerd.ntpsync'
 			},
-			onSuccess: this.syncOK.bindAsEventListener(this),
-			onFailure: this.syncFail.bindAsEventListener(this)
+			onSuccess: this.syncOK.bind(this, showBanner),
+			onFailure: this.syncFail.bind(this)
 		}
 	);
 }
 
-AppAssistant.syncOK = function ()
+AppAssistant.syncOK = function (showBanner)
 {
-	this.controller = Mojo.Controller.getAppController();
-	this.controller.showBanner("Device clock synchronized", { source: 'notification' });
-	this.controller.playSoundNotification("vibrate", "",1)
+	if (showBanner == true)
+	{
+		this.controller = Mojo.Controller.getAppController();
+		this.controller.showBanner("Device clock synchronized", { source: 'notification' });
+		this.controller.playSoundNotification("vibrate", "",1);
+		Mojo.Log.info("Manual sync");
+	}
+	else
+		Mojo.Log.info("Background sync");
 }
 
-AppAssistant.syncFail = function ()
+AppAssistant.syncFail = function (response)
 {
 	Mojo.Controller.getAppController().showBanner("Synchronization failed", { source: 'notification' });
+	if (response)
+		Mojo.Log.error(response.returnValue, response.errorText);
 }
 
 AppAssistant.scheduleSync = function (interval)
@@ -99,13 +112,14 @@ AppAssistant.scheduleSync = function (interval)
 			parameters:
 			{
 				"key": "com.webosnerd.ntpsync.sync",
-				"in": "08:00:00",
-				"wakeup": true,
+				"in": "00:10:00",
+				"wakeup": false,
 				"uri": "palm://com.palm.applicationManager/open",
-				"params": '{"id":"com.webosnerd.ntpsync","params":{"source":"none"}}'
+				"params": '{"id":"com.webosnerd.ntpsync","params":{"source":"alarm"}}'
 			}
 		}
 	);
+	Mojo.Log.info("Scheduled sync");
 }
 
 AppAssistant.clearSync = function ()
@@ -118,4 +132,5 @@ AppAssistant.clearSync = function ()
 			parameters: {"key": "com.webosnerd.ntpsync.sync"}
 		}
 	);
+	Mojo.Log.info("Cleared sync timer");
 }
